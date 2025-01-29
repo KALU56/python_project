@@ -14,7 +14,7 @@ def validate_phone_number(phone_number):
     return re.match(r"^(09|07)\d{8}$", phone_number) is not None
 
 def register():
-    with open("donor.txt", "a") as file:
+    with open("donor_registration.txt", "a") as file:
         print("Registration Form:")
         donor_id = str(uuid.uuid4())  # Generate a unique DonorID
         first_name = input("Enter your first name: ")

@@ -1,0 +1,32 @@
+DonorID: 8dc21ae0-a123-47c6-ab41-deabf0d0c8d1
+FirstName: ka
+LastName: li
+DateOfBirth: 2002-05-05
+Gender: Female
+BloodType: A
+Email: k@gmail.com
+DonorPhoneID: 6dbe3330-7d1b-4747-9e3d-da1ffb4d7fe3
+PhoneNumber: 0912345678
+PhoneType: home
+DonorAddressID: fcf71481-77bd-4b3b-bf04-41b764cbeb46
+City: aa
+Region: aa
+Wereda: aa
+Subcity: aa
+----------------------------------------
+DonorID: 98a5f901-903a-4c16-92a6-a1df3bf5bc41
+FirstName: ka
+LastName: li
+DateOfBirth: 2000-06-06
+Gender: Male
+BloodType: A
+Email: k@gmail.com
+DonorPhoneID: 32583436-d712-4b6b-bf06-c0ecb99c0714
+PhoneNumber: 0912345678
+PhoneType: home
+DonorAddressID: 88bcd6b0-d69d-46bc-bd99-6357acc2109d
+City: dd
+Region: dd
+Wereda: dd
+Subcity: dd
+----------------------------------------
