@@ -36,7 +36,14 @@ class DonorPhone:
         self.donor_id = donor_id
         self.phone_number = phone_number
         self.phone_type = phone_type
+doner_phone_id=input("please enter your name")
+doner_donor_=input("please enter your last name")
+doner_date_of_birth=input("please enter date of birth")
+doner_gender=input("please enter your gender(male or female)")
 
+donor_blood_type=input("please enter your name(A,A+,A-,B,B+,B-,O,O+,O-,AB)")
+
+donor_email=input("please enter your email address")
 
 class DonorAddress:
     def __init__(self, address_id, donor_id, city, region, wereda, subcity):
