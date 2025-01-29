@@ -7,9 +7,9 @@ class Donor:
         self.gender = gender
         self.blood_type = blood_type
         self.email = email
-        self.phones = []  # List of DonorPhone objects
-        self.addresses = []  # List of DonorAddress objects
-        self.medical_history = None  # MedicalHistory object
+        self.phones = []
+        self.addresses = []  
+        self.medical_history = None  
 
     def register(self, phone, address):
         self.phones.append(phone)
