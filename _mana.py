@@ -404,35 +404,173 @@ def approval():
             print("No appointments found.")
     except FileNotFoundError:
         print("The appointments' file does not exist yet. Please ensure that appointments have been scheduled.")
+def add_medical_info():
+    email = input("Enter the donor's email address: ").strip()
+
+    if not validate_email(email):
+        print("Invalid email format. Please enter a valid email address.")
+        return
+
+    donor_id = find_donor_by_email(email)
+    if not donor_id:
+        print("No donor found with this email.")
+        return
+
+    history_id = str(uuid.uuid4())
+    print(f"\nEnter Medical Information for Donor ID: {donor_id}")
+
+    while True:
+        try:
+            hiv = int(input("HIV (1 = Yes, 0 = No): "))
+            if hiv in (0, 1):
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Please enter 0 or 1.")
+
+    while True:
+        try:
+            syphilis = int(input("Syphilis (1 = Yes, 0 = No): "))
+            if syphilis in (0, 1):
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Please enter 0 or 1.")
+
+    while True:
+        try:
+            hepatitis_b = int(input("Hepatitis B (1 = Yes, 0 = No): "))
+            if hepatitis_b in (0, 1):
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Please enter 0 or 1.")
+
+    while True:
+        try:
+            hepatitis_c = int(input("Hepatitis C (1 = Yes, 0 = No): "))
+            if hepatitis_c in (0, 1):
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Please enter 0 or 1.")
+            
+    while True:
+        try:
+            sugar_level = float(input("Sugar Level: "))
+            if sugar_level >= 0: # Basic check, you might want more specific range
+                break
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Please enter a valid number for sugar level.")
 
 
+    outcome_details = input("Outcome Details (optional): ")
 
+
+    try:
+        with open("medical_history.txt", "a") as med_file:
+            med_file.write(f"HistoryID: {history_id}\n")
+            med_file.write(f"DonorID: {donor_id}\n")
+            med_file.write(f"HIV: {hiv}\n")
+            med_file.write(f"Syphilis: {syphilis}\n")
+            med_file.write(f"Hepatitis_B: {hepatitis_b}\n")
+            med_file.write(f"Hepatitis_C: {hepatitis_c}\n")
+            med_file.write(f"SugarLevel: {sugar_level}\n")
+            med_file.write(f"OutcomeDetails: {outcome_details}\n")
+            med_file.write("----------------------------------------\n")
+        print("Medical information added successfully!")
+
+    except Exception as e:
+        print(f"Error saving medical information: {e}")
+
+def view_medical_history(email):
+    """View medical history for a donor."""
+
+    donor_id = find_donor_by_email(email)
+    if not donor_id:
+        print("No donor found with this email.")
+        return
+
+    try:
+        with open("medical_history.txt", "r") as med_file:
+            medical_records = []
+            current_record = {}
+            for line in med_file:
+                line = line.strip()
+                if line.startswith("HistoryID:"):
+                    if current_record:  # Save the previous record
+                        medical_records.append(current_record)
+                    current_record = {"HistoryID": line.split(":")[1].strip()}
+                elif line.startswith("DonorID:") and line.split(":")[1].strip() == donor_id:
+                    current_record["DonorID"] = line.split(":")[1].strip()
+                elif line.startswith("HIV:"):
+                    current_record["HIV"] = line.split(":")[1].strip()
+                elif line.startswith("Syphilis:"):
+                    current_record["Syphilis"] = line.split(":")[1].strip()
+                elif line.startswith("Hepatitis_B:"):
+                    current_record["Hepatitis_B"] = line.split(":")[1].strip()
+                elif line.startswith("Hepatitis_C:"):
+                    current_record["Hepatitis_C"] = line.split(":")[1].strip()
+                elif line.startswith("SugarLevel:"):
+                    current_record["SugarLevel"] = line.split(":")[1].strip()
+                elif line.startswith("OutcomeDetails:"):
+                    current_record["OutcomeDetails"] = line.split(":")[1].strip()
+
+            if current_record: # Add the last one if any
+                medical_records.append(current_record)
+
+
+            if medical_records:
+                print("\nYour Medical History:")
+                for record in medical_records:
+                    print(f"History ID: {record['HistoryID']}")
+                    print(f"  HIV: {record['HIV']}")
+                    print(f"  Syphilis: {record['Syphilis']}")
+                    print(f"  Hepatitis B: {record['Hepatitis_B']}")
+                    print(f"  Hepatitis C: {record['Hepatitis_C']}")
+                    print(f"  Sugar Level: {record['SugarLevel']}")
+                    print(f"  Outcome Details: {record['OutcomeDetails']}")
+                    print("----------------------------------------")
+            else:
+                print("No medical history found for you.")
+
+    except FileNotFoundError:
+        print("Medical history file not found.")
 def donor_welcome():
     while True:
         print("\nWelcome to Donor Bank X!")
         print("-------------------------")
         print("1. Register a New Donor")
         print("2. Schedule an Appointment")
-        print("3. View Medical Information")
-        print("4.view approve or not approve")
+        print("3. View Medical Information")  # Updated option text
+        print("4. View Approved/Unapproved Appointments")
         print("5. Exit")
-        
-        option = input("Please choose an option (1, 2, 3, 4): ").strip()
-        
+
+        option = input("Please choose an option (1, 2, 3, 4, 5): ").strip()
+
         if option == "1":
             register()
         elif option == "2":
             appointment()
         elif option == "3":
-            print("Medical Information feature is under development.")
+            email = input("Enter your email address to view medical information: ").strip()
+            if validate_email(email):
+                view_medical_history(email)
+            else:
+                print("Invalid email format.")
         elif option == "4":
-           see_approval()
+            see_approval()
         elif option == "5":
             print("Exiting... Goodbye!")
             break
         else:
             print("Invalid choice! Please try again.")
-
 def supervisor_welcome():
     while True:
         print("\nWelcome to Supervisor Bank X!")
@@ -449,7 +587,7 @@ def supervisor_welcome():
         elif option == "2":
             approval()
         elif option == "3":
-            print("Medical Information feature is under development.")
+            add_medical_info()
         elif option == "4":
             print("Exiting... Goodbye!")
             break

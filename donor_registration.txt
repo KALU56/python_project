@@ -30,3 +30,35 @@ Region: dd
 Wereda: dd
 Subcity: dd
 ----------------------------------------
+DonorID: c2611e94-66fa-43cf-bbf0-c84312171347
+FirstName: a
+LastName: a
+DateOfBirth: 2000-05-05
+Gender: Male
+BloodType: A
+Email: a@gmail.com
+DonorPhoneID: 85768831-16e7-4196-a2da-9f18bf3c36d2
+PhoneNumber: 0912345678
+PhoneType: home
+DonorAddressID: c32af577-7031-4e4f-8668-731dd67bbd44
+City: aa
+Region: aa
+Wereda: aa
+Subcity: aa
+----------------------------------------
+DonorID: c9e32c14-907a-4e2b-8b92-1042f6238562
+FirstName: q
+LastName: w
+DateOfBirth: 2000-06-05
+Gender: Male
+BloodType: A
+Email: q@gmail.com
+DonorPhoneID: 4d01ce6d-6239-497c-869c-64a1eb2aeeca
+PhoneNumber: 0912345678
+PhoneType: home
+DonorAddressID: 0416a75a-edaf-4bc9-b93f-59628f25dcf0
+City: aa
+Region: aa
+Wereda: aa
+Subcity: aa
+----------------------------------------
