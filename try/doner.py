@@ -1,8 +1,8 @@
 import uuid
 import re
 from datetime import datetime
-import register  # Importing register module
-import appointment  # Importing appointment module
+import try.register as register  # Importing register module
+import try.appointment as appointment  # Importing appointment module
 
 def donor_welcome():
     while True:

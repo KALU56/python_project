@@ -1,19 +1,19 @@
 import tkinter as tk
 from tkinter import messagebox
-import register_gui  # Assuming you have a register module
-import appointment  # Assuming you have an appointment module
+import GUI.register_gui as register_gui  # Ensure this file exists and is in the same directory
+import GUI.appointment_gui as appointment_gui  # Ensure this file exists and contains the appointment() function
 
 def register_donor():
-    register_gui.register_donor()  # Call the register function from register module
+    register_gui.register_donor()  # Open donor registration window
 
 def schedule_appointment():
-    appointment.appointment()  # Call the appointment function from appointment module
+    appointment_gui.appointment()  # Open appointment scheduling window
 
 def view_medical_info():
     messagebox.showinfo("Medical Information", "This feature is under development.")
 
 def exit_app():
-    root.destroy()
+    root.quit()
 
 # Create the main window
 root = tk.Tk()

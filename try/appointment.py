@@ -1,6 +1,6 @@
 import uuid
 import re
-import register  # Importing register.py
+import try.register as register  # Importing register.py
 from datetime import datetime
 
 def validate_email(email):
