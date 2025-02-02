@@ -1,7 +1,0 @@
-AppointmentID: 9d835baa-3770-4db7-9864-435cf7a059aa
-DonorID: e48c64a7-e7ce-476c-83c9-0f8e4ebc8e94
-SupervisorID: 272a9fc1-b52e-4420-bdbb-2f6775b18423
-AppointmentDate: 2025-02-02
-AppointmentTime: 02:00
-AppointmentStatus: Scheduled
-----------------------------------------
