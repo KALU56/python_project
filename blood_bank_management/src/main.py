@@ -1,7 +1,5 @@
-
-
-import supervisor_gui
-import doner_gui
+from src.gui.doner_gui import donor_welcome
+from src.gui.supervisor_gui import supervisor_welcome
 
 def donor_welcome():
     while True:
@@ -58,15 +56,12 @@ def supervisor_welcome():
         else:
             print("Invalid choice! Please try again.")
 
-
-
 def BloodBank():
     while True:
         print("\nWelcome to Donor Bank X!")
         print("-------------------------")
-        print("1.Donor")
-        print("2.superviser")
-       
+        print("1. Donor")
+        print("2. Supervisor")
         print("3. Exit")
 
         option = input("Please choose an option (1, 2, 3): ").strip()
@@ -80,5 +75,6 @@ def BloodBank():
             break
         else:
             print("Invalid choice! Please try again.")
+
 if __name__ == "__main__":
     BloodBank()
