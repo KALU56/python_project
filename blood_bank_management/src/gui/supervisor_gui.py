@@ -1,4 +1,4 @@
-from src.config.db_config import get_db_connection
+from srcconfig.db_config import get_db_connection
 
 def view_donors():
     conn = get_db_connection()
