@@ -1,0 +1,19 @@
+DonorID: 8f463948-f78d-40bc-ac7a-7aeed026bc6a
+FirstName: kal
+LastName: la
+DateOfBirth: 2000-09-09
+Gender: Female
+BloodType: A
+Email: k@gmail.com
+DonorPhoneID: 079904a1-d878-4666-97a7-71e2665d8452
+PhoneNumber: 0912345678
+PhoneType: home
+DonorPhoneID: 0aa9260d-eb54-4625-a950-af8cce8dfcd2
+PhoneNumber: 0912345678
+PhoneType: work
+DonorAddressID: 43ffbd8f-ebad-48d1-8a9f-896e8789b3e6
+City: ha
+Region: la
+Wereda: aa
+Subcity: aa
+----------------------------------------
