@@ -1,9 +1,0 @@
-HistoryID: 4465b954-55dc-46d3-9d18-14d175687682
-Username: kal
-HIV: 1
-Syphilis: 0
-Hepatitis_B: 0
-Hepatitis_C: 0
-SugarLevel: 21
-OutcomeDetails: lkjhgf
-----------------------------------------
