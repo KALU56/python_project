@@ -1,7 +1,1 @@
-AppointmentID: aae851f1-fcf3-4ab0-87b3-71e70284fa6b
-DonorID: 8dc21ae0-a123-47c6-ab41-deabf0d0c8d1
-SupervisorID: e0d8cd83-80a8-471a-8507-4203b5cf5111
-AppointmentDate: 2025-06-06
-AppointmentTime: 12
-AppointmentStatus: Approved
-----------------------------------------
+Appointment Date: 2025-05-05 Time: 12:00
