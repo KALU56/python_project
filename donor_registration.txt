@@ -9,3 +9,14 @@ blood_type: A
 email: a@gmail.com
 phone_number: 0912345678
 ----------------------------------------
+DonorID: 731f6871-ba4d-407b-a2ce-7b737650944b
+username: kal
+password: 1234
+first_name: ka
+last_name: q
+dob: 2000-09-08
+gender: Male
+blood_type: A
+phone_number: 0912345678
+email: q@gmail.com
+----------------------------------------
