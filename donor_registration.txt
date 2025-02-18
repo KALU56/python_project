@@ -1,0 +1,22 @@
+DonorID: 2f9db384-2b27-4dd3-b2b0-1abf3dc20436
+username: kal
+password: 12345
+first_name: w
+last_name: q
+dob: 2000-09-08
+gender: Male
+blood_type: A
+phone_number: 0912345678
+email: 
+----------------------------------------
+DonorID: 0a6d82a0-96ca-48fa-979b-3d82f0486c34
+username: eee
+password: 1234
+first_name: e
+last_name: e
+dob: 2000-09-09
+gender: Male
+blood_type: B
+phone_number: 0912345678
+email: 
+----------------------------------------

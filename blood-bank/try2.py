@@ -49,14 +49,23 @@ class DonorPortal:
 
         exit_button = tk.Button(self.root, text="Exit", font=("Helvetica", 12), command=self.root.destroy)
         exit_button.pack(pady=10)
+    def go_to_donor(self):
+        donor_window = tk.Toplevel()
+        DonorPortal(donor_window)
+        self.root.destroy()  # Destroy welcome page
 
+    def go_to_supervisor(self):
+        supervisor_window = tk.Toplevel()
+        SupervisorPortal(supervisor_window)
+        self.root.destroy()  # Destroy welcome page
     def open_registration(self):
         registration_window = tk.Toplevel(self.root)
         DonorRegistrationForm(registration_window)
-
+        
     def open_login(self):
         login_window = tk.Toplevel(self.root)
         DonorLoginForm(login_window)
+        
 
 class SupervisorPortal:
     def __init__(self, root):
@@ -323,6 +332,9 @@ class SupervisorLoginForm:
         send_medical_button = tk.Button(dashboard, text="Send Medical History",
                                        command=self.open_send_medical)
         send_medical_button.pack(pady=10)
+        self.view_appointments_button = tk.Button(dashboard, text="View Appointments",
+                                         command=self.show_appointments)
+        self.view_appointments_button.pack(pady=10)
 
         exit_button = tk.Button(dashboard, text="Exit", 
                               command=dashboard.destroy)
@@ -344,7 +356,89 @@ class SupervisorLoginForm:
                 text_area.configure(state='disabled')
         except FileNotFoundError:
             messagebox.showerror("Error", "Donor records not found")
+    def show_appointments(self):
+        try:
+            with open("appointments.txt", "r") as f:
+                appointments = f.readlines()
+                
+                if not appointments:
+                    messagebox.showinfo("Appointments", "No appointments found")
+                    return
 
+                window = tk.Toplevel()
+                window.title("Appointment Approvals")
+                window.geometry("800x400")
+                
+                canvas = tk.Canvas(window)
+                scrollbar = tk.Scrollbar(window, orient="vertical", command=canvas.yview)
+                scrollable_frame = tk.Frame(canvas)
+                
+                scrollable_frame.bind(
+                    "<Configure>",
+                    lambda e: canvas.configure(
+                        scrollregion=canvas.bbox("all")
+                    )
+                )
+                
+                canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+                canvas.configure(yscrollcommand=scrollbar.set)
+                
+                for idx, appointment in enumerate(appointments):
+                    frame = tk.Frame(scrollable_frame)
+                    frame.pack(pady=5, fill=tk.X)
+                    
+                    # Parse appointment data
+                    parts = appointment.strip().split(", ")
+                    appointment_data = {p.split(": ")[0]: p.split(": ")[1] for p in parts}
+                    
+                    tk.Label(frame, text=f"Donor: {appointment_data.get('Username', 'N/A')}").pack(side=tk.LEFT)
+                    tk.Label(frame, text=f"Date: {appointment_data.get('Date')}").pack(side=tk.LEFT, padx=10)
+                    tk.Label(frame, text=f"Time: {appointment_data.get('Time')}").pack(side=tk.LEFT, padx=10)
+                    
+                    status_label = tk.Label(frame, text=f"Status: {appointment_data.get('Status', 'Pending')}")
+                    status_label.pack(side=tk.LEFT, padx=10)
+                    
+                    approve_btn = tk.Button(frame, text="Approve", 
+                                        command=lambda idx=idx: self.update_status(idx, "Approved"))
+                    approve_btn.pack(side=tk.LEFT, padx=5)
+                    
+                    disapprove_btn = tk.Button(frame, text="Disapprove", 
+                                            command=lambda idx=idx: self.update_status(idx, "Disapproved"))
+                    disapprove_btn.pack(side=tk.LEFT, padx=5)
+                
+                canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+                scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        except FileNotFoundError:
+            messagebox.showinfo("Appointments", "No appointments found")
+
+    def update_status(self, appointment_index, new_status):
+        try:
+            with open("appointments.txt", "r") as f:
+                appointments = f.readlines()
+                
+            if 0 <= appointment_index < len(appointments):
+                # Update status in the appointment line
+                parts = appointments[appointment_index].strip().split(", ")
+                updated = False
+                for i, part in enumerate(parts):
+                    if part.startswith("Status:"):
+                        parts[i] = f"Status: {new_status}"
+                        updated = True
+                        break
+                if not updated:
+                    parts.append(f"Status: {new_status}")
+                appointments[appointment_index] = ", ".join(parts) + "\n"
+                
+                with open("appointments.txt", "w") as f:
+                    f.writelines(appointments)
+                
+                messagebox.showinfo("Success", "Status updated successfully")
+            else:
+                messagebox.showerror("Error", "Invalid appointment selection")
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update status: {str(e)}")
     def open_send_medical(self):
         medical_window = tk.Toplevel()
         MedicalHistoryForm(medical_window)
@@ -492,11 +586,13 @@ class Donorappointmentform:
 
         # If valid, save the appointment (you could save it to a file or database)
         with open("appointments.txt", "a") as f:
-            f.write(f"Appointment Date: {appointment_date} Time: {appointment_time}\n")
+            f.write(f"Appointment Date: {appointment_date} Time: {appointment_time}, Status: Pending\n")
 
         messagebox.showinfo("Success", "Appointment scheduled successfully!")
         self.root.destroy()
 if __name__ == "__main__":
     root = tk.Tk()
-    app = WelcomePage(root)
+    root.withdraw()  # Keep main window hidden
+    welcome = tk.Toplevel(root)
+    app = WelcomePage(welcome)
     root.mainloop()
