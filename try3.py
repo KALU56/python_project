@@ -341,33 +341,33 @@ class SupervisorPortal:
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("""
-                    SELECT a.AppointmentID, d.Username, a.AppointmentDateTime, a.Status 
-                    FROM Appointments a
-                    JOIN Donors d ON a.DonorID = d.DonorID
-                    WHERE a.Status = 'Pending'
-                """)
-                
+                SELECT a.AppointmentID, d.Username, a.AppointmentDateTime, a.Status 
+                FROM Appointments a
+                JOIN Donors d ON a.DonorID = d.DonorID
+                WHERE a.Status = 'Pending'
+            """)
+            
             window = tk.Toplevel(self.root)
             window.title("Pending Appointments")
-                
+            
             for appointment in cursor.fetchall():
                 frame = tk.Frame(window)
                 frame.pack(pady=5)
-                    
+                
                 tk.Label(frame, text=f"{appointment.Username} - {appointment.AppointmentDateTime}").pack(side=tk.LEFT)
+                
+                msg_frame = tk.Frame(frame)
+                msg_frame.pack(side=tk.LEFT)
+                tk.Label(msg_frame, text="Message:").pack()
+                message_entry = tk.Entry(msg_frame)
+                message_entry.pack()
+                
                 tk.Button(frame, text="Approve", 
-                            msg_frame = tk.Frame(frame)
-                    msg_frame.pack(side=tk.LEFT)
-                    tk.Label(msg_frame, text="Message:").pack()
-                    message_entry = tk.Entry(msg_frame)
-                    message_entry).pack()
-                    
-                tk.Button(frame, text="Approve", 
-                        command=lambda id=appointment.AppointmentID, e=message_entry: 
-                        self.update_status(id, "Approved", e.get())).pack(side=tk.LEFT)
+                         command=lambda id=appointment.AppointmentID, e=message_entry: 
+                         self.update_status(id, "Approved", e.get())).pack(side=tk.LEFT)
                 tk.Button(frame, text="Reject", 
-                        command=lambda id=appointment.AppointmentID, e=message_entry: 
-                        self.update_status(id, "Disapproved", e.get())).pack(side=tk.LEFT)
+                         command=lambda id=appointment.AppointmentID, e=message_entry: 
+                         self.update_status(id, "Disapproved", e.get())).pack(side=tk.LEFT)
         except Exception as e:
                 messagebox.showerror("Database Error", str(e))
         finally:

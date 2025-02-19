@@ -20,3 +20,14 @@ blood_type: B
 phone_number: 0912345678
 email: 
 ----------------------------------------
+DonorID: e1eae294-7f28-4341-9cbb-c0e6935fe36e
+username: ka
+password: 12
+first_name: a
+last_name: a
+dob: 2000-09-09
+gender: Male
+blood_type: A
+phone_number: 0912345678
+email: 
+----------------------------------------
