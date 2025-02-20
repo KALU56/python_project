@@ -16,8 +16,8 @@ conn = pyodbc.connect(
 cursor = conn.cursor()
 
 # Style configuration
-BG_COLOR = "#ffe6e6"  # Light pink background
-BUTTON_COLOR = "#cc0000"  # Dark red
+BG_COLOR = "#ffe6e6"
+BUTTON_COLOR = "#cc0000"
 BUTTON_TEXT_COLOR = "white"
 HEADER_COLOR = "#cc0000"
 TEXT_COLOR = "#333333"
@@ -32,7 +32,7 @@ class BloodDonationSystem:
         self.style = ttk.Style()
         self._configure_styles()
         self.show_welcome_page()
-        
+
     def _configure_styles(self):
         self.style.theme_use('clam')
         self.style.configure("TButton", 
@@ -43,23 +43,19 @@ class BloodDonationSystem:
                            relief="flat")
         self.style.map("TButton",
                       background=[("active", "#ff3333"), ("!active", BUTTON_COLOR)])
-        
         self.style.configure("Header.TLabel",
                             font=("Arial", 18, "bold"),
                             foreground="white",
                             background=HEADER_COLOR,
                             padding=10)
-                            
         self.style.configure("Body.TLabel",
                             font=("Arial", 10),
                             background=BG_COLOR,
                             foreground=TEXT_COLOR)
-        
         self.style.configure("TEntry",
                            fieldbackground=ENTRY_BG,
                            relief="flat",
                            padding=5)
-                           
         self.style.configure("Treeview.Heading",
                            font=("Arial", 10, "bold"),
                            background=TREE_HEADER_COLOR,
@@ -68,22 +64,22 @@ class BloodDonationSystem:
                            background="white",
                            fieldbackground="white",
                            rowheight=25)
-        
+
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
-    
+
     def _create_header(self, title):
         header_frame = tk.Frame(self.root, bg=HEADER_COLOR)
         header_frame.pack(fill="x", pady=(0, 20))
         ttk.Label(header_frame, text=title, style="Header.TLabel").pack()
         return header_frame
-    
+
     def _create_content_frame(self):
         content_frame = tk.Frame(self.root, bg=BG_COLOR)
         content_frame.pack(padx=20, pady=20, fill="both", expand=True)
         return content_frame
-    
+
     def show_welcome_page(self):
         self.clear_window()
         self._create_header("Welcome to Blood Donation System")
@@ -93,7 +89,7 @@ class BloodDonationSystem:
         ttk.Button(content_frame, text="Donor", command=self.donor_login_page, style=btn_style).pack(pady=10, fill="x")
         ttk.Button(content_frame, text="Supervisor", command=self.supervisor_login_page, style=btn_style).pack(pady=10, fill="x")
 
-    # Donor related functions
+    # ================== DONOR SECTION ==================
     def donor_login_page(self):
         self.clear_window()
         self._create_header("Donor Login")
@@ -112,7 +108,6 @@ class BloodDonationSystem:
         
         button_frame = tk.Frame(content_frame, bg=BG_COLOR)
         button_frame.pack(pady=20)
-        
         ttk.Button(button_frame, text="Login", command=self.donor_login, style="TButton").pack(side="left", padx=5)
         ttk.Button(button_frame, text="Register", command=self.donor_register_page, style="TButton").pack(side="left", padx=5)
         ttk.Button(button_frame, text="Back", command=self.show_welcome_page, style="TButton").pack(side="left", padx=5)
@@ -136,8 +131,7 @@ class BloodDonationSystem:
         
         fields = [
             "Username", "Password", "First Name", "Last Name",
-            "Date of Birth", "Gender", 
-            "Email", "Blood Type", "Phone Number"
+            "Date of Birth", "Gender", "Email", "Blood Type", "Phone Number"
         ]
         
         self.entries = {}
@@ -161,7 +155,6 @@ class BloodDonationSystem:
         
         button_frame = tk.Frame(content_frame, bg=BG_COLOR)
         button_frame.pack(pady=15)
-        
         ttk.Button(button_frame, text="Submit", command=self.submit_registration, style="TButton").pack(side="left", padx=5)
         ttk.Button(button_frame, text="Back", command=self.donor_login_page, style="TButton").pack(side="left", padx=5)
 
@@ -169,19 +162,19 @@ class BloodDonationSystem:
         data = {k: v.get() for k, v in self.entries.items()}
         data["Date of Birth"] = data["Date of Birth"].strftime('%Y-%m-%d')
 
-        # Validation
         if not (data["Phone Number"].startswith("09") or data["Phone Number"].startswith("07")) or len(data["Phone Number"]) != 10:
             messagebox.showerror("Error", "Invalid phone number")
             return
         
         try:
             cursor.execute("""
-                INSERT INTO Donors (username, password, first_name, last_name, date_of_birth, gender, email, blood_type, phone_number)
+                INSERT INTO Donors (username, password, first_name, last_name, 
+                date_of_birth, gender, email, blood_type, phone_number)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["Username"], data["Password"], data["First Name"], data["Last Name"],
-                data["Date of Birth"], data["Gender"], 
-                data["Email"] if data["Email"] else None, data["Blood Type"], data["Phone Number"]
+                data["Date of Birth"], data["Gender"], data["Email"] if data["Email"] else None,
+                data["Blood Type"], data["Phone Number"]
             ))
             conn.commit()
             messagebox.showinfo("Success", "Registration successful")
@@ -199,7 +192,6 @@ class BloodDonationSystem:
             ("Make Appointment", self.make_appointment),
             ("View Medical History", self.view_medical_history),
             ("View Health Status", self.view_health_status),
-            ("Appointment Status", self.view_appointment_status),
             ("Logout", self.show_welcome_page)
         ]
         
@@ -210,71 +202,53 @@ class BloodDonationSystem:
         window = tk.Toplevel(self.root)
         window.title("Make Appointment")
         window.configure(bg=BG_COLOR)
-        
         content_frame = tk.Frame(window, bg=BG_COLOR)
         content_frame.pack(padx=20, pady=20)
         
-        fields = [
-            ("Date", "entry"),
-            ("Time (HH:MM)", "entry"),
-            ("Message", "entry")
-        ]
-        
+        fields = ["Date", "Time (HH:MM)", "Message"]
         entries = {}
-        for field, _ in fields:
+        
+        for field in fields:
             frame = tk.Frame(content_frame, bg=BG_COLOR)
             frame.pack(pady=5, fill="x")
             ttk.Label(frame, text=f"{field}:", style="Body.TLabel").pack(side="left", padx=5)
+            
             if field == "Date":
                 entry = DateEntry(frame, date_pattern='yyyy-mm-dd')
             else:
                 entry = ttk.Entry(frame, style="TEntry")
+            
             entry.pack(side="right", expand=True, fill="x", padx=5)
             entries[field] = entry
         
         def submit():
-            cursor.execute("""
-                INSERT INTO Appointments (donor_id, appointment_date, appointment_time, message, status)
-                VALUES (?, ?, ?, ?, 'Pending')
-            """, (self.donor_id, entries["Date"].get(), 
-                 entries["Time (HH:MM)"].get(), entries["Message"].get()))
-            conn.commit()
-            messagebox.showinfo("Success", "Appointment created. Please check status later.")
-            window.destroy()
+            try:
+                appt_date = entries["Date"].get()
+                appt_time = entries["Time (HH:MM)"].get()
+                message = entries["Message"].get()
+                
+                datetime.strptime(appt_date, '%Y-%m-%d')
+                datetime.strptime(appt_time, '%H:%M')
+                
+                if len(message) > 500:
+                    raise ValueError("Message too long (max 500 characters)")
+                
+                # Insert appointment with Pending status
+                cursor.execute("""
+                    INSERT INTO Appointments (donor_id, appointment_date, appointment_time, message, status)
+                    VALUES (?, ?, ?, ?, 'Pending')
+                """, (self.donor_id, appt_date, appt_time, message))
+                conn.commit()
+                messagebox.showinfo("Success", "Appointment requested!")
+                window.destroy()
+                
+            except ValueError as ve:
+                messagebox.showerror("Input Error", str(ve))
+            except pyodbc.Error as e:
+                messagebox.showerror("Database Error", f"Failed to create appointment:\n{str(e)}")
+                conn.rollback()
         
         ttk.Button(content_frame, text="Submit", command=submit, style="TButton").pack(pady=10, fill="x")
-
-    def view_appointment_status(self):
-        cursor.execute("""
-            SELECT appointment_date, appointment_time, message, status, supervisor_message 
-            FROM Appointments 
-            WHERE donor_id = ?
-        """, (self.donor_id,))
-        appointments = cursor.fetchall()
-        
-        window = tk.Toplevel(self.root)
-        window.title("Appointment Status")
-        window.configure(bg=BG_COLOR)
-        
-        tree_frame = tk.Frame(window, bg=BG_COLOR)
-        tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        columns = ("Date", "Time", "Your Message", "Status", "Supervisor Message")
-        tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
-        vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=vsb.set)
-        
-        tree.grid(row=0, column=0, sticky="nsew")
-        vsb.grid(row=0, column=1, sticky="ns")
-        tree_frame.grid_rowconfigure(0, weight=1)
-        tree_frame.grid_columnconfigure(0, weight=1)
-        
-        for col in columns:
-            tree.heading(col, text=col)
-            tree.column(col, width=100, anchor="center")
-        
-        for appt in appointments:
-            tree.insert("", "end", values=appt)
 
     def view_medical_history(self):
         cursor.execute("""
@@ -286,7 +260,7 @@ class BloodDonationSystem:
         window = tk.Toplevel(self.root)
         window.title("Medical History")
         window.configure(bg=BG_COLOR)
-        window.state('zoomed')  # Maximize the window
+        window.state('zoomed')
         
         tree_frame = tk.Frame(window, bg=BG_COLOR)
         tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
@@ -303,45 +277,44 @@ class BloodDonationSystem:
         
         for col in columns:
             tree.heading(col, text=col)
-            tree.column(col, width=150, anchor="center", stretch=tk.YES)  # Wider columns with stretching
+            tree.column(col, width=150, anchor="center", stretch=tk.YES)
         
         for row in results:
-            formatted_row = list(row)  # Convert tuple to list
-            formatted_row[5] = str(formatted_row[5])  # Convert date_of_birth to string
-            tree.insert("", "end", values=formatted_row)
+            tree.insert("", "end", values=row)
 
     def view_health_status(self):
-            cursor.execute("""
-                SELECT donation_date, weight, blood_pressure, sugar_level, start_time, end_time 
-                FROM HealthStatuses WHERE donor_id=?
-            """, (self.donor_id,))
-            results = cursor.fetchall()
-            
-            window = tk.Toplevel(self.root)
-            window.title("Health Status")
-            window.configure(bg=BG_COLOR)
-            window.state('zoomed')  # Maximize the window
-            
-            tree_frame = tk.Frame(window, bg=BG_COLOR)
-            tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
-            
-            columns = ("Date", "Weight", "BP", "Sugar", "Start", "End")
-            tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
-            vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
-            tree.configure(yscrollcommand=vsb.set)
-            
-            tree.grid(row=0, column=0, sticky="nsew")
-            vsb.grid(row=0, column=1, sticky="ns")
-            tree_frame.grid_rowconfigure(0, weight=1)
-            tree_frame.grid_columnconfigure(0, weight=1)
-            
-            for col in columns:
-                tree.heading(col, text=col)
-                tree.column(col, width=150, anchor="center", stretch=tk.YES)  # Wider columns with stretching
-            
-            for row in results:
-                tree.insert("", "end", values=row)
-    # Supervisor related functions
+        cursor.execute("""
+            SELECT donation_date, weight, blood_pressure, sugar_level, start_time, end_time 
+            FROM HealthStatuses WHERE donor_id=?
+        """, (self.donor_id,))
+        results = cursor.fetchall()
+        
+        window = tk.Toplevel(self.root)
+        window.title("Health Status")
+        window.configure(bg=BG_COLOR)
+        window.state('zoomed')
+        
+        tree_frame = tk.Frame(window, bg=BG_COLOR)
+        tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        columns = ("Date", "Weight", "BP", "Sugar", "Start", "End")
+        tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
+        vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=vsb.set)
+        
+        tree.grid(row=0, column=0, sticky="nsew")
+        vsb.grid(row=0, column=1, sticky="ns")
+        tree_frame.grid_rowconfigure(0, weight=1)
+        tree_frame.grid_columnconfigure(0, weight=1)
+        
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=150, anchor="center", stretch=tk.YES)
+        
+        for row in results:
+            tree.insert("", "end", values=row)
+
+    # ================== SUPERVISOR SECTION ==================
     def supervisor_login_page(self):
         self.clear_window()
         self._create_header("Supervisor Login")
@@ -360,7 +333,6 @@ class BloodDonationSystem:
         
         button_frame = tk.Frame(content_frame, bg=BG_COLOR)
         button_frame.pack(pady=20)
-        
         ttk.Button(button_frame, text="Login", command=self.supervisor_login, style="TButton").pack(side="left", padx=5)
         ttk.Button(button_frame, text="Back", command=self.show_welcome_page, style="TButton").pack(side="left", padx=5)
 
@@ -386,7 +358,6 @@ class BloodDonationSystem:
         
         buttons = [
             ("View Donors", self.view_donors),
-            ("Appointment Confirmations", self.view_appointments),
             ("Send Medical History", self.send_medical_history),
             ("Send Health Status", self.send_health_status),
             ("Logout", self.show_welcome_page)
@@ -421,120 +392,23 @@ class BloodDonationSystem:
             tree.column(col, width=100, anchor="center")
         
         for row in results:
-            formatted_row = list(row)  # Convert tuple to list
-            formatted_row[5] = str(formatted_row[5])  # Convert date_of_birth to string
+            formatted_row = list(row)
+            formatted_row[5] = str(formatted_row[5])
             tree.insert("", "end", values=formatted_row)
 
-    def view_appointments(self):
-        cursor.execute("""
-            SELECT a.appointment_id, d.username, a.appointment_date, 
-                   a.appointment_time, a.message 
-            FROM Appointments a
-            JOIN Donors d ON a.donor_id = d.donor_id
-            WHERE a.status = 'Pending'
-        """)
-        appointments = cursor.fetchall()
-        
-        window = tk.Toplevel(self.root)
-        window.title("Pending Appointments")
-        window.configure(bg=BG_COLOR)
-        
-        main_frame = tk.Frame(window, bg=BG_COLOR)
-        main_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        tree_frame = tk.Frame(main_frame, bg=BG_COLOR)
-        tree_frame.pack(fill="both", expand=True)
-        
-        columns = ("ID", "Donor", "Date", "Time", "Message")
-        tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
-        vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=vsb.set)
-        
-        tree.grid(row=0, column=0, sticky="nsew")
-        vsb.grid(row=0, column=1, sticky="ns")
-        tree_frame.grid_rowconfigure(0, weight=1)
-        tree_frame.grid_columnconfigure(0, weight=1)
-        
-        for col in columns:
-            tree.heading(col, text=col)
-            tree.column(col, width=100, anchor="center")
-        
-        for appt in appointments:
-            tree.insert("", "end", values=appt)
-        
-        btn_frame = tk.Frame(main_frame, bg=BG_COLOR)
-        btn_frame.pack(pady=10)
-        
-        ttk.Button(btn_frame, text="Approve", command=lambda: self._handle_appointment(tree, "Approved"), style="TButton").pack(side="left", padx=5)
-        ttk.Button(btn_frame, text="Reject", command=lambda: self._handle_appointment(tree, "Rejected"), style="TButton").pack(side="left", padx=5)
-
-    def _handle_appointment(self, tree, status):
-        selected = tree.selection()
-        if not selected:
-            messagebox.showerror("Error", "Select an appointment first!")
-            return
-        
-        appt_id = tree.item(selected[0])["values"][0]
-        
-        # Get donor_id from the appointment
-        cursor.execute("SELECT donor_id FROM Appointments WHERE appointment_id=?", (appt_id,))
-        donor_id_result = cursor.fetchone()
-        if not donor_id_result:
-            messagebox.showerror("Error", "Appointment not found")
-            return
-        donor_id = donor_id_result[0]
-        
-        supervisor_message = ""
-        
-        if status == "Approved":
-            # Check donor's age
-            cursor.execute("SELECT date_of_birth FROM Donors WHERE donor_id=?", (donor_id,))
-            dob_result = cursor.fetchone()
-            if not dob_result:
-                messagebox.showerror("Error", "Donor not found")
-                return
-            dob_str = dob_result[0]
-            dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
-            today = datetime.today().date()
-            age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-            
-            if age < 18:
-                status = "Rejected"
-                supervisor_message = "Thank you, but you must be 18 years or older."
-            else:
-                supervisor_message = "Thank you for your volunteer!"
-        elif status == "Rejected":
-            # Prompt supervisor for a message
-            supervisor_message = simpledialog.askstring("Rejection Reason", "Enter the reason for rejection:")
-            if supervisor_message is None:  # User cancelled
-                return
-        
-        # Update the appointment with status and supervisor message
-        cursor.execute("""
-            UPDATE Appointments 
-            SET status = ?, supervisor_message = ?
-            WHERE appointment_id = ?
-        """, (status, supervisor_message, appt_id))
-        conn.commit()
-        
-        messagebox.showinfo("Success", f"Appointment {status.lower()}")
-        tree.delete(selected[0])
     def send_medical_history(self):
         window = tk.Toplevel(self.root)
         window.title("Send Medical History")
         window.configure(bg=BG_COLOR)
-        
         content_frame = tk.Frame(window, bg=BG_COLOR)
         content_frame.pack(padx=20, pady=20)
         
         fields = [
-            "Donor Username", "Entry Date",
-            "HIV Status", "Syphilis Status",
-            "Hepatitis Status", "Sugar Level",
-            "Outcome Message"
+            "Donor Username", "Entry Date", "HIV Status", 
+            "Syphilis Status", "Hepatitis Status", "Sugar Level", "Outcome Message"
         ]
-        
         entries = {}
+        
         for field in fields:
             frame = tk.Frame(content_frame, bg=BG_COLOR)
             frame.pack(pady=3, fill="x")
@@ -585,17 +459,15 @@ class BloodDonationSystem:
         window = tk.Toplevel(self.root)
         window.title("Send Health Status")
         window.configure(bg=BG_COLOR)
-        
         content_frame = tk.Frame(window, bg=BG_COLOR)
         content_frame.pack(padx=20, pady=20)
-     
-        fields = [
-            "Donor Username", "Donation Date",
-            "Weight", "Blood Pressure", "Sugar Level",
-            "Start Time (HH:MM)", "End Time (HH:MM)"
-        ]
         
+        fields = [
+            "Donor Username", "Donation Date", "Weight", 
+            "Blood Pressure", "Sugar Level", "Start Time (HH:MM)", "End Time (HH:MM)"
+        ]
         entries = {}
+        
         for field in fields:
             frame = tk.Frame(content_frame, bg=BG_COLOR)
             frame.pack(pady=3, fill="x")
