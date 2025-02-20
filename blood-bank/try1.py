@@ -270,6 +270,7 @@ class BloodDonationSystem:
         window = tk.Toplevel(self.root)
         window.title("Medical History")
         window.configure(bg=BG_COLOR)
+        window.state('zoomed')  # Maximize the window
         
         tree_frame = tk.Frame(window, bg=BG_COLOR)
         tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
@@ -286,42 +287,42 @@ class BloodDonationSystem:
         
         for col in columns:
             tree.heading(col, text=col)
-            tree.column(col, width=100, anchor="center")
+            tree.column(col, width=150, anchor="center", stretch=tk.YES)  # Wider columns with stretching
         
         for row in results:
             tree.insert("", "end", values=row)
 
     def view_health_status(self):
-        cursor.execute("""
-            SELECT donation_date, weight, blood_pressure, sugar_level, start_time, end_time 
-            FROM HealthStatuses WHERE donor_id=?
-        """, (self.donor_id,))
-        results = cursor.fetchall()
-        
-        window = tk.Toplevel(self.root)
-        window.title("Health Status")
-        window.configure(bg=BG_COLOR)
-        
-        tree_frame = tk.Frame(window, bg=BG_COLOR)
-        tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        columns = ("Date", "Weight", "BP", "Sugar", "Start", "End")
-        tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
-        vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=vsb.set)
-        
-        tree.grid(row=0, column=0, sticky="nsew")
-        vsb.grid(row=0, column=1, sticky="ns")
-        tree_frame.grid_rowconfigure(0, weight=1)
-        tree_frame.grid_columnconfigure(0, weight=1)
-        
-        for col in columns:
-            tree.heading(col, text=col)
-            tree.column(col, width=100, anchor="center")
-        
-        for row in results:
-            tree.insert("", "end", values=row)
-
+            cursor.execute("""
+                SELECT donation_date, weight, blood_pressure, sugar_level, start_time, end_time 
+                FROM HealthStatuses WHERE donor_id=?
+            """, (self.donor_id,))
+            results = cursor.fetchall()
+            
+            window = tk.Toplevel(self.root)
+            window.title("Health Status")
+            window.configure(bg=BG_COLOR)
+            window.state('zoomed')  # Maximize the window
+            
+            tree_frame = tk.Frame(window, bg=BG_COLOR)
+            tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
+            
+            columns = ("Date", "Weight", "BP", "Sugar", "Start", "End")
+            tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
+            vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+            tree.configure(yscrollcommand=vsb.set)
+            
+            tree.grid(row=0, column=0, sticky="nsew")
+            vsb.grid(row=0, column=1, sticky="ns")
+            tree_frame.grid_rowconfigure(0, weight=1)
+            tree_frame.grid_columnconfigure(0, weight=1)
+            
+            for col in columns:
+                tree.heading(col, text=col)
+                tree.column(col, width=150, anchor="center", stretch=tk.YES)  # Wider columns with stretching
+            
+            for row in results:
+                tree.insert("", "end", values=row)
     # Supervisor related functions
     def supervisor_login_page(self):
         self.clear_window()
