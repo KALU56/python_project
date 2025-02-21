@@ -3,8 +3,9 @@ from tkinter import ttk, messagebox
 import pyodbc
 from datetime import datetime
 from tkcalendar import DateEntry
+from datetime import datetime
+from decimal import Decimal
 
-# Database connection
 conn = pyodbc.connect(
     'DRIVER={ODBC Driver 17 for SQL Server};'
     'SERVER=KALKIDAN;'
@@ -14,7 +15,7 @@ conn = pyodbc.connect(
 )
 cursor = conn.cursor()
 
-# Language configurations
+
 LANGUAGES = {
     'en': {
         'welcome': "Welcome to Blood Donation System",
@@ -71,9 +72,9 @@ LANGUAGES = {
         'send_health_status': "Send Health Status",
     },
     'am': {
-        'welcome': "የደም ልገሳ ስርዓት እንኳን በደህና መጡ",
+        'welcome': "እንኳን ወደ ደም ባንክ በደህና መጡ",
         'donor': "ደም ለጋሽ",
-        'supervisor': "ተጠሪ",
+        'supervisor': "ተቆጣጣሪ",
         'login': "ግባ",
         'register': "ይመዝገቡ",
         'back': "ተመለስ",
@@ -119,14 +120,14 @@ LANGUAGES = {
         'none': "የለም",
         'donor_login': "ደም ለጋሽ መግቢያ",
         'donor_registration': "ደም ለጋሽ ምዝገባ",
-        'supervisor_login': "ተጠሪ መግቢያ",
+        'supervisor_login': "ተቆጣጣሪ መግቢያ",
         'view_donors': "ደም ለጋሾችን ይመልከቱ",
         'send_medical_history': "የሕክምና ታሪክ ላክ",
         'send_health_status': "የጤና ሁኔታ ላክ",
     }
 }
 
-# Style configuration
+
 BG_COLOR = "#ffe6e6"
 BUTTON_COLOR = "#cc0000"
 BUTTON_TEXT_COLOR = "white"
@@ -199,7 +200,7 @@ class BloodDonationSystem:
         self._create_header('welcome')
         content_frame = self._create_content_frame()
         
-        # Language selection
+        
         lang_frame = tk.Frame(content_frame, bg=BG_COLOR)
         lang_frame.pack(pady=10)
         ttk.Label(lang_frame, text="Language:", style="Body.TLabel").pack(side=tk.LEFT)
@@ -219,7 +220,7 @@ class BloodDonationSystem:
         ttk.Button(content_frame, text=self.tr('supervisor'), command=self.supervisor_login_page, 
                  style=btn_style).pack(pady=10, fill="x")
 
-    # ================== DONOR SECTION ==================
+ 
     def donor_login_page(self):
         self.clear_window()
         self._create_header("donor_login")
@@ -295,7 +296,7 @@ class BloodDonationSystem:
 
     def submit_registration(self):
         data = {k: v.get() for k, v in self.entries.items()}
-        data["date_of_birth"] = data["date_of_birth"].strftime('%Y-%m-%d')
+   
 
         if not (data["phone_number"].startswith("09") or data["phone_number"].startswith("07")) or len(data["phone_number"]) != 10:
             messagebox.showerror(self.tr('error'), self.tr('invalid_phone'))
@@ -356,35 +357,36 @@ class BloodDonationSystem:
             
             entry.pack(side="right", expand=True, fill="x", padx=5)
             entries[field] = entry
-        
+            
         def submit():
             try:
                 appt_date = entries["appointment_date"].get()
                 appt_time = entries["appointment_time"].get()
                 message = entries["appointment_message"].get()
-                
+            
                 datetime.strptime(appt_date, '%Y-%m-%d')
                 datetime.strptime(appt_time, '%H:%M')
+
                 
                 if len(message) > 500:
-                    raise ValueError(self.tr('message_too_long'))
+                    messagebox.showerror(self.tr('error'), "Message exceeds 500 characters.")
+                    return
                 
                 cursor.execute("""
                     INSERT INTO Appointments (donor_id, appointment_date, appointment_time, message, status)
-                    VALUES (?, ?, ?, ?, 'Pending')
-                """, (self.donor_id, appt_date, appt_time, message))
+                    VALUES (?, ?, ?, ?, ?)
+                """, (self.donor_id, appt_date, appt_time, message, 'Pending'))
                 conn.commit()
                 messagebox.showinfo(self.tr('success'), self.tr('appointment_success'))
                 window.destroy()
-                
+                            
             except ValueError as ve:
-                messagebox.showerror(self.tr('error'), str(ve))
+                    messagebox.showerror("Input Error", str(ve))
             except pyodbc.Error as e:
-                messagebox.showerror(self.tr('error'), str(e))
-                conn.rollback()
-        
-        ttk.Button(content_frame, text=self.tr('submit'), command=submit, 
-                 style="TButton").pack(pady=10, fill="x")
+                    messagebox.showerror("Database Error", f"Failed to create appointment:\n{str(e)}")
+                    conn.rollback()
+                    
+        ttk.Button(content_frame, text="Submit", command=submit, style="TButton").pack(pady=10, fill="x")
 
     def view_medical_history(self):
         cursor.execute("""
@@ -392,15 +394,28 @@ class BloodDonationSystem:
             FROM MedicalHistories WHERE donor_id=?
         """, (self.donor_id,))
         results = cursor.fetchall()
+     
+        processed_results = []
+        for row in results:
+            new_row = []
+            for value in row:
+                if isinstance(value, datetime.date):
+                    new_value = value.strftime("%Y-%m-%d") 
+                elif isinstance(value, Decimal):
+                    new_value = float(value)
+                else:
+                    new_value = value
+                new_row.append(new_value)
+            processed_results.append(tuple(new_row))
         
+    
         window = tk.Toplevel(self.root)
         window.title(self.tr('medical_history'))
-        window.state('zoomed')
         
         tree_frame = tk.Frame(window, bg=BG_COLOR)
         tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
-        columns = ["entry_date", "hiv_status", "syphilis_status", "hepatitis_status", "sugar_level", "outcome_message"]
+        columns = ["Date", "hiv_status", "syphilis_status", "hepatitis_status", "sugar_level", "outcome_message"]
         tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
         vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=vsb.set)
@@ -412,9 +427,9 @@ class BloodDonationSystem:
         
         for col in columns:
             tree.heading(col, text=self.tr(col))
-            tree.column(col, width=150, anchor="center")
+            tree.column(col, width=150, anchor="center", stretch=tk.YES)
         
-        for row in results:
+        for row in processed_results: 
             tree.insert("", "end", values=row)
 
     def view_health_status(self):
@@ -424,14 +439,28 @@ class BloodDonationSystem:
         """, (self.donor_id,))
         results = cursor.fetchall()
         
+        
+        processed_results = []
+        for row in results:
+            new_row = []
+            for value in row:
+                if isinstance(value, datetime.date):
+                    new_value = value.strftime("%Y-%m-%d")  
+                elif isinstance(value, Decimal):
+                    new_value = float(value) 
+                else:
+                    new_value = value
+                new_row.append(new_value)
+            processed_results.append(tuple(new_row))
+        
+       
         window = tk.Toplevel(self.root)
         window.title(self.tr('health_status'))
-        window.state('zoomed')
         
         tree_frame = tk.Frame(window, bg=BG_COLOR)
         tree_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
-        columns = ["donation_date", "weight", "blood_pressure", "sugar_level", "start_time", "end_time"]
+        columns = ["Date", "weight", "blood_pressure", "sugar_level", "start_time", "end_time"]
         tree = ttk.Treeview(tree_frame, columns=columns, show="headings", style="Treeview")
         vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=vsb.set)
@@ -443,12 +472,11 @@ class BloodDonationSystem:
         
         for col in columns:
             tree.heading(col, text=self.tr(col))
-            tree.column(col, width=150, anchor="center")
+            tree.column(col, width=150, anchor="center", stretch=tk.YES)
         
-        for row in results:
+        for row in processed_results:  
             tree.insert("", "end", values=row)
 
-    # ================== SUPERVISOR SECTION ==================
     def supervisor_login_page(self):
         self.clear_window()
         self._create_header("supervisor_login")
